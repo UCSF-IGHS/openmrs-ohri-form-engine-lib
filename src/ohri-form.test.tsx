@@ -3,6 +3,7 @@ import React from 'react';
 import OHRIForm from './ohri-form.component';
 import hts_poc_1_1 from '../__mocks__/packages/hiv/forms/hts_poc/1.1.json';
 import bmi_form from '../__mocks__/packages/other-forms/bmi-test-form.json';
+import edd_form from '../__mocks__/packages/other-forms/edd-test-form.json';
 import { mockPatient } from '../__mocks__/patient.mock';
 const patientUUID = '8673ee4f-e2ab-4077-ba55-4980f408773e';
 
@@ -45,6 +46,29 @@ describe('OHRI Forms: ', () => {
 
   describe('Form submission', () => {
     // TODO: Fillup test suite
+  });
+
+  describe('Calculate edd', () => {
+    afterEach(() => {
+      cleanup();
+    });
+
+    it('Should evaluate EDD', async () => {
+      // setup
+      await renderForm(edd_form);
+      let eddField = screen.getByRole('date', { name: /EDD/ }) as HTMLInputElement;
+      let lmpField = screen.getByRole('date', { name: /LMP/ }) as HTMLInputElement;
+
+      expect(eddField.value).toBe('');
+      expect(lmpField.value).toBe('');
+
+      // replay
+      fireEvent.blur(lmpField, { target: { value: '2022-07-06T00:00:00.000Z' } });
+
+      // verify
+      expect(lmpField.value).toBe('2022-07-06T00:00:00.000Z');
+      expect(eddField.value).toBe('2023-04-13T00:00:00.000Z');
+    });
   });
 
   describe('Calcuated values', () => {
