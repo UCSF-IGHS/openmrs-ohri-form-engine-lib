@@ -70,9 +70,6 @@ export function evaluateExpression(
   function calcBMI(heightQuestionId, weightQuestionId) {
     const height = allFieldValues[heightQuestionId];
     const weight = allFieldValues[weightQuestionId];
-    console.log('INITIAL HEIGHT', height);
-    console.log('INITIAL WEIGHT', weight);
-    console.log('ALL FIELD KEYS', allFieldsKeys);
     [heightQuestionId, weightQuestionId].forEach(entry => {
       if (allFieldsKeys.includes(entry)) {
         registerDependency(
@@ -84,7 +81,6 @@ export function evaluateExpression(
     let r;
     if (height && weight) {
       r = (weight / (((height / 100) * height) / 100)).toFixed(1);
-      console.log('FINAL VALUE', r);
     }
     return height && weight ? parseFloat(r) : null;
   }
