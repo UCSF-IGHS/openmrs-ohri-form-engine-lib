@@ -95,7 +95,7 @@ export function evaluateExpression(
         );
       }
     });
-    let resultEdd;
+    let resultEdd = {};
     if (lmp) {
       resultEdd = new Date(lmp.getTime() + 280 * 24 * 60 * 60 * 1000);
       console.log('EDD', resultEdd);
