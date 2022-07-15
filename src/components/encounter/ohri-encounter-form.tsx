@@ -1,4 +1,3 @@
-/* eslint-disable no-debugger, no-console */
 import { openmrsObservableFetch, useLayoutType } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ConceptFalse, ConceptTrue, encounterRepresentation } from '../../constants';
@@ -297,9 +296,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
   const [invalidFields, setInvalidFields] = useState([]);
 
   useEffect(() => {
-    console.log({ invalidFields });
     if (invalidFields?.length) {
-      console.log(invalidFields[0].label);
       scrollIntoView(invalidFields[0].id);
     }
   }, [invalidFields]);
