@@ -1,3 +1,4 @@
+/* eslint-disable no-debugger, no-console */
 import { openmrsObservableFetch, useLayoutType } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ConceptFalse, ConceptTrue, encounterRepresentation } from '../../constants';
@@ -23,6 +24,7 @@ import { FormSubmissionHandler } from '../../ohri-form.component';
 import { isTrue } from '../../utils/boolean-utils';
 import { evaluateExpression } from '../../utils/expression-runner';
 import { getPreviousEncounter, saveEncounter } from '../../api/api';
+import { scrollIntoView } from '../../utils/ohri-sidebar';
 
 interface OHRIEncounterFormProps {
   formJson: OHRIFormSchema;
@@ -292,8 +294,19 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
     }
   }, []);
 
+  const [invalidFields, setInvalidFields] = useState([]);
+
+  useEffect(() => {
+    console.log({ invalidFields });
+    if (invalidFields?.length) {
+      console.log(invalidFields[0].label);
+      scrollIntoView(invalidFields[0].id);
+    }
+  }, [invalidFields]);
+
   const validate = useCallback(
     values => {
+      let errorFields = [];
       let formHasErrors = false;
       // handle field validation
       fields
@@ -302,6 +315,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
         .forEach(field => {
           const errors = OHRIFieldValidator.validate(field, values[field.id]);
           if (errors.length) {
+            errorFields.push(field);
             field['submission'] = {
               ...field['submission'],
               errors: errors,
@@ -310,6 +324,8 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
             return;
           }
         });
+      setInvalidFields([...errorFields]);
+
       return !formHasErrors;
     },
     [fields],
