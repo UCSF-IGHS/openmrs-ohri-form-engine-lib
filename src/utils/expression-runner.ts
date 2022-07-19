@@ -168,7 +168,7 @@ export function evaluateExpression(
       : null;
   }
 
-  function validateAge(questionId) {
+  function calcAgeBasedOnDate(questionId) {
     const value = allFieldValues[questionId];
     [questionId].forEach(entry => {
       if (allFieldsKeys.includes(entry)) {

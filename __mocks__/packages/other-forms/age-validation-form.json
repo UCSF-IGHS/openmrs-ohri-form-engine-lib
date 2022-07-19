@@ -42,7 +42,7 @@
 							"id": "MRN",
 							"validators": [],
 							"hide": {
-                                "hideWhenExpression": "validateAge('enrollmentDate') > 5"
+                                "hideWhenExpression": "calcAgeBasedOnDate('enrollmentDate') > 5"
                             }
 						}
 					]
