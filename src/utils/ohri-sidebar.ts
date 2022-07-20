@@ -1,7 +1,9 @@
 export function scrollIntoView(viewId: string) {
-  document.getElementById(viewId).scrollIntoView({
+  const currentElement = document.getElementById(viewId);
+  currentElement?.scrollIntoView({
     behavior: 'smooth',
-    block: 'start',
-    inline: 'start',
+    block: 'nearest',
+    inline: 'nearest',
   });
+  currentElement?.focus();
 }

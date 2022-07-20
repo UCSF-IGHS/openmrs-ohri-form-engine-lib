@@ -297,7 +297,17 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
 
   useEffect(() => {
     if (invalidFields?.length) {
-      scrollIntoView(invalidFields[0].id);
+      let firstInvalidField = invalidFields[0];
+      let answerOptionid: string;
+      if (firstInvalidField.questionOptions.rendering === 'radio') {
+        answerOptionid = `${firstInvalidField.id}-${firstInvalidField.questionOptions.answers[0].label}`;
+        scrollIntoView(answerOptionid);
+      } else if (firstInvalidField.questionOptions.rendering === 'checkbox') {
+        answerOptionid = `${firstInvalidField.label}-input`;
+        scrollIntoView(answerOptionid);
+      } else {
+        scrollIntoView(firstInvalidField.id);
+      }
     }
   }, [invalidFields]);
 
