@@ -301,12 +301,12 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
       let answerOptionid: string;
       if (firstInvalidField.questionOptions.rendering === 'radio') {
         answerOptionid = `${firstInvalidField.id}-${firstInvalidField.questionOptions.answers[0].label}`;
-        scrollIntoView(answerOptionid);
+        scrollIntoView(answerOptionid, true);
       } else if (firstInvalidField.questionOptions.rendering === 'checkbox') {
         answerOptionid = `${firstInvalidField.label}-input`;
-        scrollIntoView(answerOptionid);
+        scrollIntoView(answerOptionid, true);
       } else {
-        scrollIntoView(firstInvalidField.id);
+        scrollIntoView(firstInvalidField.id, true);
       }
     }
   }, [invalidFields]);
