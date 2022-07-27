@@ -9,7 +9,7 @@
 					"isExpanded": "true",
 					"questions": [
 						{
-							"label": "Viral load count",
+							"label": "Viral Load Count",
 							"type": "obs",
 							"questionOptions": {
 								"rendering": "number",
@@ -39,7 +39,7 @@
 							"id": "viralLoadCount"
 						},
 						{
-							"label": "Viral load status",
+							"label": "Viral Load Status",
 							"type": "obs",
 							"questionOptions": {
 								"rendering": "radio",
