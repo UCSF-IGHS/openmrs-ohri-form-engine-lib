@@ -31,7 +31,7 @@ jobs:
           node-version: "16.x"
       - run: yarn install
       - run: yarn lint
-      - run: yarn build --if-present
+      - run: yarn build
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
