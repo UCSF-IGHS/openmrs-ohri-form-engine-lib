@@ -191,7 +191,7 @@ const constructFormFieldPath = (id: string): string => {
   return `ohri-forms-${id}`;
 };
 
-const getEncounterObs = (encounter: any, field: OHRIFormField) => {
+export const getEncounterObs = (encounter: any, field: OHRIFormField) => {
   let obs = encounter.obs.find(o => o.formFieldPath == constructFormFieldPath(field.id));
   if (!obs) {
     obs = encounter.obs.find(o => o.concept.uuid == field.questionOptions.concept && !o.formFieldPath);
