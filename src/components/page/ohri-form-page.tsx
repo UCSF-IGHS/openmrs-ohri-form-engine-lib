@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './_page.scss';
 import OHRIFormSection from '../section/ohri-form-section.component';
 import { Waypoint } from 'react-waypoint';
-import { Accordion, AccordionItem } from 'carbon-components-react';
+import { Accordion, AccordionItem } from '@carbon/react';
 import { isTrue } from '../../utils/boolean-utils';
 
 function OHRIFormPage({ page, onFieldChange, setSelectedPage, isCollapsed }) {

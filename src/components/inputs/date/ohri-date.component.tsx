@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { OHRIFormFieldProps } from '../../../api/types';
-import { DatePicker, DatePickerInput, TimePicker } from 'carbon-components-react';
+import { DatePicker, DatePickerInput, TimePicker } from '@carbon/react';
 import { useField } from 'formik';
 import { OHRIFormContext } from '../../../ohri-form-context';
 import styles from '../_input.scss';

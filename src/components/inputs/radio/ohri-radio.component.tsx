@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FormGroup, RadioButtonGroup, RadioButton } from 'carbon-components-react';
+import { FormGroup, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { OHRIFormFieldProps } from '../../../api/types';
 import { useField } from 'formik';
 import { OHRIFormContext } from '../../../ohri-form-context';

@@ -9,7 +9,7 @@ import OHRIFormSidebar from './components/sidebar/ohri-form-sidebar.component';
 import { OHRIEncounterForm } from './components/encounter/ohri-encounter-form';
 import { isTrue } from './utils/boolean-utils';
 import { useWorkspaceLayout } from './utils/useWorkspaceLayout';
-import { Button } from 'carbon-components-react';
+import { Button } from '@carbon/react';
 import ReactMarkdown from 'react-markdown';
 import { PatientBanner } from './components/patient-banner/patient-banner.component';
 import LoadingIcon from './components/loading/loading.component';

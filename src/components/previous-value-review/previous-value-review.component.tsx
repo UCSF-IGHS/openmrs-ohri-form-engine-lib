@@ -1,4 +1,4 @@
-import { Button } from 'carbon-components-react';
+import { Button } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { OHRIValueDisplay } from '../value/ohri-value.component';
