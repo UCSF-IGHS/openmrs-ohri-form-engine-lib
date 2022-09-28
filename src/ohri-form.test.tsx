@@ -115,7 +115,7 @@ describe('OHRI Forms: ', () => {
       expect(monthsOnARTField.value).toBe('');
 
       // replay
-      fireEvent.blur(artStartDateField, { target: { value: '5/2/2022' } });
+      fireEvent.blur(artStartDateField, { target: { value: '05/02/2022' } });
 
       // verify
       expect(artStartDateField.value).toBe('5/2/2022');
