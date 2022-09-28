@@ -694,9 +694,9 @@ describe('ObsSubmissionHandler - getInitialValue', () => {
     };
     encounterContext.encounter['obs'].push(obs);
     // replay
-    const initialValue = ObsSubmissionHandler.getInitialValue(encounterContext.encounter, field);
+    const initialValue: any = ObsSubmissionHandler.getInitialValue(encounterContext.encounter, field);
     // verify
-    expect(initialValue).toEqual(new Date(2016, 10, 19));
+    expect(initialValue.toLocaleDateString('en-US')).toEqual('11/19/2016');
   });
 
   it('should get initial value for coded input types', () => {
