@@ -2,15 +2,9 @@ name: Form-engine-CI
 
 on:
   push:
-    tags:
-      - '*'
-    branches:
-      - '*'
-
+    branches: [main]
   pull_request:
-    branches:
-      - '*'
-    types: [opened, synchronize]
+    branches: [main]
   release:
     types:
       - created
