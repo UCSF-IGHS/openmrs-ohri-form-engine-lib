@@ -45,7 +45,9 @@ const OHRIDate: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler })
 
   const onTimeChange = (event, useValue = false) => {
     if (useValue) {
-      const prevValue = handler.getPreviousValue(question, encounterContext?.previousEncounter, fields);
+      const prevValue =
+        encounterContext?.previousEncounter &&
+        handler.getPreviousValue(question, encounterContext?.previousEncounter, fields);
       setTime(moment(prevValue?.value).format('hh:mm'));
     } else {
       const time = event.target.value;
