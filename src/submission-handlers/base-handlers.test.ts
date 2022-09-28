@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { EncounterContext } from '../ohri-form-context';
-import * as mockAPI from '../api/api';
+import * as api from '../api/api';
 import { OHRIFormField } from '../api/types';
 import { findObsByFormField, ObsSubmissionHandler } from './base-handlers';
 
@@ -674,7 +674,7 @@ describe('ObsSubmissionHandler - getInitialValue', () => {
     expect(initialValue).toEqual(['105e7ad6-c1fd-11eb-8529-0242ac130ju9', '6f337e18-5445-437f-8298-684a7067dc1c']);
   });
 
-  xit('should get initial value for date rendering', () => {
+  it('should get initial value for date rendering', () => {
     // setup
     const field: OHRIFormField = {
       label: 'HTS Date',
@@ -728,18 +728,19 @@ describe('ObsSubmissionHandler - getInitialValue', () => {
 
   it('should update obs value with boolean concept uuid for boolean types', () => {
     // setup
-    spyOn(mockAPI, 'getConcept').and.returnValue(
-      new Observable(sub => {
-        sub.next({
-          uuid: '1492AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Ever tested positive for HIV before?',
-          datatype: {
-            uuid: 'bca4d5f1-ee6a-4282-a5ff-c8db12c4247c',
-            display: 'Boolean',
-            name: 'Boolean',
-          },
-        });
-      }),
+    jest.spyOn(api, 'getConcept').mockImplementationOnce(
+      () =>
+        new Observable(sub => {
+          sub.next({
+            uuid: '1492AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            display: 'Ever tested positive for HIV before?',
+            datatype: {
+              uuid: 'bca4d5f1-ee6a-4282-a5ff-c8db12c4247c',
+              display: 'Boolean',
+              name: 'Boolean',
+            },
+          });
+        }),
     );
     const field: OHRIFormField = {
       label: 'Ever tested positive for HIV before?',

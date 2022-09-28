@@ -6,7 +6,7 @@ export const OHRILabel: React.FC<{ value: string; tooltipText?: string }> = ({ v
   return (
     <div className={styles.ohriLabel}>
       <DefinitionTooltip direction="bottom" tabIndex={0} tooltipText={tooltipText}>
-        <span className="bx--label" style={{ fontWeight: 'bolder' }}>
+        <span className="cds--label" style={{ fontWeight: 'bolder' }}>
           {value}
         </span>
       </DefinitionTooltip>

@@ -144,6 +144,12 @@ const OHRIDate: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler })
                 value={
                   field.value instanceof Date ? field.value.toLocaleDateString(window.navigator.language) : field.value
                 }
+                // Added for testing purposes.
+                // Notes:
+                // Something is strange is happening with the way events are propagated and handled by Carbon.
+                // When we manually trigger an onchange event using the 'fireEvent' lib, the handler below will
+                // be triggered as opposed to the former hanlder that only gets triggered at runtime.
+                onChange={e => onDateChange([moment(e.target.value).toDate()])}
                 disabled={question.disabled}
                 invalid={!isFieldRequiredError && errors.length > 0}
                 invalidText={errors[0]?.errMessage}

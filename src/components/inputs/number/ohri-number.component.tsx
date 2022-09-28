@@ -93,7 +93,7 @@ const OHRINumber: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler 
             value={field.value || ''}
             onFocus={() => setPreviousValue(field.value)}
             allowEmpty={true}
-            size="xl"
+            size="lg"
             hideSteppers={true}
             disabled={question.disabled}
             className={isFieldRequiredError ? styles.errorLabel : ''}

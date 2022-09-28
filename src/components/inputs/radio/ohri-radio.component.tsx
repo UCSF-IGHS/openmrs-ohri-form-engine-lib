@@ -91,7 +91,7 @@ const OHRIRadio: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler }
             </RadioButtonGroup>
             {!isFieldRequiredError && errors?.length > 0 && (
               <div className={styles.errorLabel}>
-                <div className={`bx--form-requirement`}>{errors[0].errMessage}</div>
+                <div className={`cds--form-requirement`}>{errors[0].errMessage}</div>
               </div>
             )}
           </FormGroup>
