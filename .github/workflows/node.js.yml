@@ -58,9 +58,10 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - run: yarn install
       - run: sed -i -e "s/\(\"version\":\\s\+\"\([0-9]\+\.\?\)\+\)/\1-pre.${{ github.run_number }}/" 'package.json'
+      - run: |
+          yarn config set npmAlwaysAuth true
+          yarn config set npmAuthToken ${{ secrets.NPM_TOKEN }}
       - run: yarn npm publish --tag next
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_OHRI_ACCESS_TOKEN }}
   
   master_release:
     runs-on: ubuntu-latest
