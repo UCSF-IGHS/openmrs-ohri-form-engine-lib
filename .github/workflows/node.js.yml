@@ -58,7 +58,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - run: yarn install
       - run: sed -i -e "s/\(\"version\":\\s\+\"\([0-9]\+\.\?\)\+\)/\1-pre.${{ github.run_number }}/" 'package.json'
-      - run: yarn publish --tag next
+      - run: yarn npm publish --tag next
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_OHRI_ACCESS_TOKEN }}
   
