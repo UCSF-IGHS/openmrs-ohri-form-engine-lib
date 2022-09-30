@@ -85,10 +85,6 @@ const OHRIForm: React.FC<OHRIFormProps> = ({
     return workspaceLayout != 'minimized' && scrollAblePages.size > 0;
   }, [workspaceLayout, scrollAblePages.size]);
 
-  const formStillSubmitting = useMemo(() => {
-    return isSubmitting;
-  }, [isSubmitting]);
-
   useEffect(() => {
     const extDetails = {
       id: 'ohri-form-header-toggle-ext',
@@ -196,7 +192,7 @@ const OHRIForm: React.FC<OHRIFormProps> = ({
             <div className={styles.ohriFormContainer}>
               {showSideBar && (
                 <OHRIFormSidebar
-                  isFormSubmitting={formStillSubmitting}
+                  isFormSubmitting={isSubmitting}
                   scrollAblePages={scrollAblePages}
                   selectedPage={selectedPage}
                   mode={mode}
@@ -244,7 +240,7 @@ const OHRIForm: React.FC<OHRIFormProps> = ({
                   <div className={styles.minifiedButtons}>
                     <Button
                       kind="secondary"
-                      disabled={formStillSubmitting}
+                      disabled={isSubmitting}
                       onClick={() => {
                         onCancel && onCancel();
                         handleClose && handleClose();
@@ -252,7 +248,7 @@ const OHRIForm: React.FC<OHRIFormProps> = ({
                       {mode == 'view' ? 'Close' : 'Cancel'}
                     </Button>
                     {mode != 'view' && (
-                      <Button type="submit" disabled={formStillSubmitting}>
+                      <Button type="submit" disabled={isSubmitting}>
                         Save
                       </Button>
                     )}
