@@ -204,7 +204,7 @@ const OHRIForm: React.FC<OHRIFormProps> = ({
             <div className={styles.ohriFormContainer}>
               {showSideBar && (
                 <OHRIFormSidebar
-                  isFormSubmiting={isSubmitting}
+                  isFormSubmitting={isSubmitting}
                   scrollAblePages={scrollAblePages}
                   selectedPage={selectedPage}
                   mode={mode}
