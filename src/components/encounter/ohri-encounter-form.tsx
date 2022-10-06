@@ -1,3 +1,4 @@
+/* eslint-disable no-debugger, no-console */
 import { openmrsObservableFetch, useLayoutType } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ConceptFalse, ConceptTrue, encounterRepresentation } from '../../constants';
@@ -14,6 +15,7 @@ import {
   cascadeVisibityToChildFields,
   evaluateFieldReadonlyProp,
   inferInitialValueFromDefaultFieldValue,
+  updateErrorsStateForFieldPage,
   voidObsValueOnFieldHidden,
 } from '../../utils/ohri-form-helper';
 import { isEmpty, isEmpty as isValueEmpty, OHRIFieldValidator } from '../../validators/ohri-form-validator';
@@ -446,6 +448,9 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
         [];
       setErrors && setErrors(errors);
       if (errors.length) {
+        //Add logic for error page
+        updateErrorsStateForFieldPage(field, errors, scrollablePages);
+        console.log(scrollablePages);
         return;
       }
     }
