@@ -92,15 +92,19 @@ export function voidObsValueOnFieldHidden(
   }
 }
 
-export function updateErrorsStateForFieldPage(field: OHRIFormField, errors: any, pages: Set<OHRIFormPage>): void {
-  if (errors.length) {
-    const pageWithError = [...pages].find(page =>
-      page.sections.find(section => section.questions.find(question => question === field)),
-    );
-    if (pageWithError) {
-      pages.delete(pageWithError);
-      pageWithError.hasErrors = true;
-      pages.add(pageWithError);
-    }
+export function findPagesWithErrors(pages: Set<OHRIFormPage>, errorFields: OHRIFormField[]): string[] {
+  let pagesWithErrors: string[] = [];
+  let allFormPages = [...pages];
+  if (errorFields?.length) {
+    //Find pages each of the errors belong to
+    errorFields.forEach(field => {
+      allFormPages.forEach(page => {
+        let errorPage = page.sections.find(section => section.questions.find(question => question === field));
+        if (errorPage && !pagesWithErrors.includes(page.label)) {
+          pagesWithErrors.push(page.label);
+        }
+      });
+    });
   }
+  return pagesWithErrors;
 }

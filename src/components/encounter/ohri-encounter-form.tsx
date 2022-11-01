@@ -1,4 +1,3 @@
-/* eslint-disable no-debugger, no-console */
 import { openmrsObservableFetch, useLayoutType } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ConceptFalse, ConceptTrue, encounterRepresentation } from '../../constants';
@@ -14,8 +13,8 @@ import {
 import {
   cascadeVisibityToChildFields,
   evaluateFieldReadonlyProp,
+  findPagesWithErrors,
   inferInitialValueFromDefaultFieldValue,
-  updateErrorsStateForFieldPage,
   voidObsValueOnFieldHidden,
 } from '../../utils/ohri-form-helper';
 import { isEmpty, isEmpty as isValueEmpty, OHRIFieldValidator } from '../../validators/ohri-form-validator';
@@ -42,6 +41,7 @@ interface OHRIEncounterFormProps {
   workspaceLayout: 'minimized' | 'maximized';
   setAllInitialValues: (values: Record<string, any>) => void;
   setScrollablePages: (pages: Set<OHRIFormPageProps>) => void;
+  setPagesWithErrors: (pages: string[]) => void;
   setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
   setSelectedPage: (page: string) => void;
   isSubmitting: boolean;
@@ -59,6 +59,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
   scrollablePages,
   workspaceLayout,
   setScrollablePages,
+  setPagesWithErrors,
   setFieldValue,
   setSelectedPage,
   handlers,
@@ -314,6 +315,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
 
   useEffect(() => {
     if (invalidFields?.length) {
+      setPagesWithErrors(findPagesWithErrors(scrollablePages, invalidFields));
       let firstInvalidField = invalidFields[0];
       let answerOptionid: string;
       if (firstInvalidField.questionOptions.rendering === 'radio') {
@@ -448,11 +450,12 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
         [];
       setErrors && setErrors(errors);
       if (errors.length) {
-        //Add logic for error page
-        updateErrorsStateForFieldPage(field, errors, scrollablePages);
-        console.log(scrollablePages);
+        setInvalidFields(invalidFields => [...invalidFields, field]);
         return;
+      } else {
+        setInvalidFields(invalidFields => invalidFields.filter(item => item !== field));
       }
+      setPagesWithErrors(findPagesWithErrors(scrollablePages, invalidFields));
     }
     if (field.questionOptions.rendering == 'toggle') {
       value = value ? ConceptTrue : ConceptFalse;
@@ -581,6 +584,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
               setAllInitialValues={setAllInitialValues}
               allInitialValues={allInitialValues}
               setScrollablePages={setScrollablePages}
+              setPagesWithErrors={setPagesWithErrors}
               setFieldValue={setFieldValue}
               setSelectedPage={setSelectedPage}
               handlers={handlers}
