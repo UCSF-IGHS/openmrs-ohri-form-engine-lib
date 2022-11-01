@@ -72,7 +72,6 @@ export interface OHRIFormPage {
   inlineRendering?: 'single-line' | 'multiline' | 'automatic';
   readonly?: string | boolean;
   subform?: { name?: string; package?: string; behaviours?: Array<any>; form: OHRIFormSchema };
-  hasErrors?: boolean;
 }
 export interface OHRIFormField {
   label: string;
