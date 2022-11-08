@@ -107,13 +107,15 @@ export const OHRIRepeat: React.FC<OHRIFormFieldProps> = ({ question, onChange })
   const nodes = questions.map((question, index) => {
     const deleteControl =
       questions.length > 1 ? (
-        <div style={{ paddingTop: '1.2rem', marginLeft: '.5rem' }} className={styles.flex_column}>
-          <Button
-            renderIcon={() => <TrashCan size={32} />}
-            kind="danger--tertiary"
-            onClick={() => removeNthRow(question)}
-            hasIconOnly
-          />
+        <div>
+          <div style={{ paddingTop: '1.2rem', marginLeft: '.5rem' }} className={styles.flexColumn}>
+            <Button
+              renderIcon={() => <TrashCan size={16} />}
+              kind="danger--tertiary"
+              onClick={() => removeNthRow(question)}
+              hasIconOnly
+            />
+          </div>
         </div>
       ) : null;
     return (

@@ -192,14 +192,14 @@
   align-items: baseline;
 }
 
-.flex_row {
+.flexRow {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   width: 100%;
 }
 
-.flex_column {
+.flexColumn {
   display: flex;
   flex-direction: column;
   margin-right: 2.5rem;

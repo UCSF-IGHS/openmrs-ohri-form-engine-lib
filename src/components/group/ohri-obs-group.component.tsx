@@ -32,7 +32,7 @@ export const OHRIObsGroup: React.FC<ObsGroupProps> = ({ question, onChange, dele
           handler: getHandler(field.type),
         });
         return (
-          <div className={`${styles.flex_column} ${styles.obsGroupColumn} `}>
+          <div className={`${styles.flexColumn} ${styles.obsGroupColumn} `}>
             {supportsUnspecified(field) ? (
               <>
                 {qnFragment}
@@ -48,5 +48,5 @@ export const OHRIObsGroup: React.FC<ObsGroupProps> = ({ question, onChange, dele
   if (groupContent && deleteControl) {
     groupContent.push(deleteControl);
   }
-  return <div className={styles.flex_row}>{groupContent}</div>;
+  return <div className={styles.flexRow}>{groupContent}</div>;
 };
