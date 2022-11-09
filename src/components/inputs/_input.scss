@@ -224,7 +224,7 @@
   margin-left: 5rem;
 }
 
-.formField :global(.cds--form-item){
+.formField > div {
   margin-right: 02rem !important;
   flex: none !important;
   box-sizing: content-box !important;
