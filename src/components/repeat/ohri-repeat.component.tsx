@@ -91,7 +91,6 @@ export const OHRIRepeat: React.FC<OHRIFormFieldProps> = ({ question, onChange })
       questionIds.push(q.id);
     });
     next.questions.forEach(q => {
-      questionIds.push(q.id);
       q.id = `${q.id}-${idSuffix}`;
       q['groupId'] = next.id;
       q.value = null;
