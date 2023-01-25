@@ -89,7 +89,7 @@ function OHRIFormSidebar({
       })}
       <hr className={styles.sideBarHorizontalLine} />
       <div className={styles.sidenavActions}>
-        {allowUnspecifiedAll && (
+        {allowUnspecifiedAll && mode !== 'view' && (
           <div style={{ marginBottom: '.6rem' }}>
             <Toggle
               labelText=""

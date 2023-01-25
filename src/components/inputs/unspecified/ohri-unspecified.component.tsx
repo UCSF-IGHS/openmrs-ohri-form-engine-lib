@@ -4,15 +4,17 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { OHRIFormContext } from '../../../ohri-form-context';
 import styles from '../_input.scss';
 import { OHRIFieldValidator } from '../../../validators/ohri-form-validator';
-import { OHRIFormField } from '../../../api/types';
+import { OHRIFormField, SessionMode } from '../../../api/types';
 import { isTrue } from '../../../utils/boolean-utils';
 
 export const OHRIUnspecified: React.FC<{
   question: OHRIFormField;
-}> = ({ question }) => {
+  sessionMode?: SessionMode;
+}> = ({ question, sessionMode }) => {
   const [field, meta] = useField(`${question.id}-unspecified`);
   const { setFieldValue } = React.useContext(OHRIFormContext);
   const [previouslyUnspecified, setPreviouslyUnspecified] = useState(false);
+  const [hideCheckBox, setHideCheckBox] = useState(false);
 
   useEffect(() => {
     if (field.value) {
@@ -42,6 +44,9 @@ export const OHRIUnspecified: React.FC<{
   useEffect(() => {
     if (question.value) {
       setFieldValue(`${question.id}-unspecified`, false);
+      if (sessionMode == 'view') {
+        setHideCheckBox(true);
+      }
     }
   }, [question.value]);
 
@@ -51,7 +56,8 @@ export const OHRIUnspecified: React.FC<{
 
   return (
     !question.isHidden &&
-    !isTrue(question.readonly) && (
+    !isTrue(question.readonly) &&
+    !hideCheckBox && (
       <div className={styles.unspecified}>
         <Checkbox
           id={`${question.id}-unspcified`}

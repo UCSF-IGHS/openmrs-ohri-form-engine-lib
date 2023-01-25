@@ -5,7 +5,7 @@ import { Waypoint } from 'react-waypoint';
 import { Accordion, AccordionItem } from '@carbon/react';
 import { isTrue } from '../../utils/boolean-utils';
 
-function OHRIFormPage({ page, onFieldChange, setSelectedPage, isCollapsed }) {
+function OHRIFormPage({ page, sessionMode, onFieldChange, setSelectedPage, isCollapsed }) {
   let newLabel = page.label.replace(/\s/g, '');
 
   const handleEnter = elementID => {
@@ -25,7 +25,12 @@ function OHRIFormPage({ page, onFieldChange, setSelectedPage, isCollapsed }) {
               return (
                 <AccordionItem title={sec.label} open={isCollapsed} className={styles.sectionContent} key={index}>
                   <div className={styles.formSection} key={index}>
-                    <OHRIFormSection fields={sec.questions} onFieldChange={onFieldChange} key={index} />
+                    <OHRIFormSection
+                      sessionMode={sessionMode}
+                      fields={sec.questions}
+                      onFieldChange={onFieldChange}
+                      key={index}
+                    />
                   </div>
                 </AccordionItem>
               );

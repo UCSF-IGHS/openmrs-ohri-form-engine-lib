@@ -190,6 +190,7 @@ export const OHRIRepeat: React.FC<OHRIFormFieldProps> = ({ question, onChange })
             onChange={onChange}
             handler={getHandler('obsGroup')}
             deleteControl={deleteControl}
+            sessionMode={encounterContext.sessionMode}
           />
         </div>
       </>
@@ -198,16 +199,18 @@ export const OHRIRepeat: React.FC<OHRIFormFieldProps> = ({ question, onChange })
 
   nodes.push(
     <div>
-      <Button
-        renderIcon={() => <Add size={16} />}
-        kind="ghost"
-        onClick={() => {
-          const nextCount = counter + 1;
-          handleAdd(nextCount, null);
-          setCounter(nextCount);
-        }}>
-        {question.questionOptions.repeatOptions?.addText || 'Add'}
-      </Button>
+      {encounterContext.sessionMode != 'view' && (
+        <Button
+          renderIcon={() => <Add size={16} />}
+          kind="ghost"
+          onClick={() => {
+            const nextCount = counter + 1;
+            handleAdd(nextCount, null);
+            setCounter(nextCount);
+          }}>
+          {question.questionOptions.repeatOptions?.addText || 'Add'}
+        </Button>
+      )}
     </div>,
   );
   return (
