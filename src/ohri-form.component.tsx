@@ -216,7 +216,9 @@ const OHRIForm: React.FC<OHRIFormProps> = ({
             <LoadingIcon />
           ) : (
             <div className={styles.ohriFormContainer}>
-              <LinearLoader />
+              <div className={styles.ohriFormBody}>
+                <LinearLoader />
+              </div>
               <div className={styles.ohriFormBody}>
                 {showSideBar && (
                   <OHRIFormSidebar
