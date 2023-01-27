@@ -87,7 +87,11 @@ function OHRIFormSidebar({
           )
         );
       })}
-      <hr className={styles.sideBarHorizontalLine} />
+      {mode == 'view' ? (
+        <div className={styles.sideBarHorizontalLine}></div>
+      ) : (
+        <hr className={styles.sideBarHorizontalLine} />
+      )}
       <div className={styles.sidenavActions}>
         {allowUnspecifiedAll && mode !== 'view' && (
           <div style={{ marginBottom: '.6rem' }}>
