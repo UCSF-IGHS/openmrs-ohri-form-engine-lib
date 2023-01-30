@@ -17,6 +17,7 @@ export const OHRIMultiSelect: React.FC<OHRIFormFieldProps> = ({ question, onChan
   const [field, meta] = useField(question.id);
   const { setFieldValue, encounterContext, layoutType, workspaceLayout } = React.useContext(OHRIFormContext);
   const [errors, setErrors] = useState([]);
+  const [warnings, setWarnings] = useState([]);
   const [counter, setCounter] = useState(0);
   const [touched, setTouched] = useState(false);
   const [conceptName, setConceptName] = useState('Loading...');
@@ -105,7 +106,7 @@ export const OHRIMultiSelect: React.FC<OHRIFormFieldProps> = ({ question, onChan
             itemToString={item => (item ? item.label : ' ')}
             disabled={question.disabled}
             invalid={!isFieldRequiredError && errors.length > 0}
-            invalidText={errors[0]?.errMessage}
+            invalidText={errors[0]?.message}
           />
         </div>
         <div className={styles.formField} style={{ marginTop: '0.125rem' }}>

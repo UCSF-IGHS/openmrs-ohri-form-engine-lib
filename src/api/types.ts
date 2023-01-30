@@ -41,7 +41,13 @@ export interface FieldValidator {
   /**
    * Validates a field and returns validation errors
    */
-  validate(field: OHRIFormField, value: any, config?: any): { errCode: string; errMessage: string }[];
+  validate(field: OHRIFormField, value: any, config?: any): Array<ValidationResult>;
+}
+
+interface ValidationResult {
+  resultType: 'warning' | 'error' | 'info';
+  errCode?: string;
+  message: string;
 }
 
 export interface HideProps {

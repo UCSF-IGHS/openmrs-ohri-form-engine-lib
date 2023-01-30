@@ -85,7 +85,7 @@ const OHRIText: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler })
               onFocus={() => setPreviousValue(field.value)}
               disabled={question.disabled}
               invalid={!isFieldRequiredError && errors.length > 0}
-              invalidText={errors.length && errors[0].errMessage}
+              invalidText={errors.length && errors[0].message}
             />
           </div>
           {previousValueForReview && (

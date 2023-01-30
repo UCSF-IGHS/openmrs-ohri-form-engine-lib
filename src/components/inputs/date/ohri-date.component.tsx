@@ -164,7 +164,7 @@ const OHRIDate: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler })
                 onChange={e => onDateChange([moment(e.target.value, ['YYYY-MM-DD', 'DD/MM/YYYY']).toDate()])}
                 disabled={question.disabled}
                 invalid={!isFieldRequiredError && errors.length > 0}
-                invalidText={errors[0]?.errMessage}
+                invalidText={errors[0]?.message}
               />
             </DatePicker>
           </div>

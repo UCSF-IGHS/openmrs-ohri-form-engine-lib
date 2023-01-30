@@ -47,7 +47,7 @@ describe('OHRIDefaultFieldValueValidator - validate', () => {
     const errors = OHRIDefaultFieldValueValidator.validate(codedField, 'some none existing value');
 
     // verify
-    expect(errors).toEqual([{ errCode: 'invalid.defaultValue', errMessage: 'Value not found in coded answers list' }]);
+    expect(errors).toEqual([{ errCode: 'invalid.defaultValue', message: 'Value not found in coded answers list' }]);
   });
 
   it('should accept valid date values', () => {
@@ -63,7 +63,7 @@ describe('OHRIDefaultFieldValueValidator - validate', () => {
     const errors = OHRIDefaultFieldValueValidator.validate(dateField, 'test date');
 
     // verify
-    expect(errors).toEqual([{ errCode: 'invalid.defaultValue', errMessage: `Invalid date value: 'test date'` }]);
+    expect(errors).toEqual([{ errCode: 'invalid.defaultValue', message: `Invalid date value: 'test date'` }]);
   });
 
   it('should accept valid numeric values', () => {
@@ -79,6 +79,6 @@ describe('OHRIDefaultFieldValueValidator - validate', () => {
     const errors = OHRIDefaultFieldValueValidator.validate(numericField, '500.5hds');
 
     // verify
-    expect(errors).toEqual([{ errCode: 'invalid.defaultValue', errMessage: `Invalid numerical  value: '500.5hds'` }]);
+    expect(errors).toEqual([{ errCode: 'invalid.defaultValue', message: `Invalid numerical  value: '500.5hds'` }]);
   });
 });
