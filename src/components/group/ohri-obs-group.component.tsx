@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { getHandler } from '../../registry/registry';
-import { OHRIFormFieldProps, SessionMode } from '../../api/types';
+import { OHRIFormFieldProps } from '../../api/types';
 import { OHRIUnspecified } from '../inputs/unspecified/ohri-unspecified.component';
 import styles from '../inputs/_input.scss';
 import { getFieldControl, supportsUnspecified } from '../section/ohri-form-section.component';
+import { OHRIFormContext } from '../../ohri-form-context';
 export interface ObsGroupProps extends OHRIFormFieldProps {
   deleteControl?: any;
-  sessionMode?: SessionMode;
 }
 
-export const OHRIObsGroup: React.FC<ObsGroupProps> = ({ question, onChange, deleteControl, sessionMode }) => {
+export const OHRIObsGroup: React.FC<ObsGroupProps> = ({ question, onChange, deleteControl }) => {
   const [groupMembersControlMap, setGroupMembersControlMap] = useState([]);
+  const { encounterContext } = React.useContext(OHRIFormContext);
 
   useEffect(() => {
     Promise.all(
@@ -37,7 +38,7 @@ export const OHRIObsGroup: React.FC<ObsGroupProps> = ({ question, onChange, dele
             {supportsUnspecified(field) ? (
               <>
                 {qnFragment}
-                <OHRIUnspecified question={field} sessionMode={sessionMode} />
+                <OHRIUnspecified question={field} />
               </>
             ) : (
               qnFragment

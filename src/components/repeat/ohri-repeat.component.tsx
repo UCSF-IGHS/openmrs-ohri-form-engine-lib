@@ -190,16 +190,15 @@ export const OHRIRepeat: React.FC<OHRIFormFieldProps> = ({ question, onChange })
             onChange={onChange}
             handler={getHandler('obsGroup')}
             deleteControl={deleteControl}
-            sessionMode={encounterContext.sessionMode}
           />
         </div>
       </>
     );
   });
 
-  nodes.push(
-    <div>
-      {encounterContext.sessionMode != 'view' && (
+  encounterContext.sessionMode != 'view' &&
+    nodes.push(
+      <div>
         <Button
           renderIcon={() => <Add size={16} />}
           kind="ghost"
@@ -210,9 +209,8 @@ export const OHRIRepeat: React.FC<OHRIFormFieldProps> = ({ question, onChange })
           }}>
           {question.questionOptions.repeatOptions?.addText || 'Add'}
         </Button>
-      )}
-    </div>,
-  );
+      </div>,
+    );
   return (
     !question.isHidden && (
       <div style={{ marginTop: '0.65rem', marginBottom: '2rem' }}>

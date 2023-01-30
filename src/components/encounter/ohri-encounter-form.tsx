@@ -601,7 +601,6 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
         return (
           <OHRIFormPage
             page={page}
-            sessionMode={sessionMode}
             onFieldChange={onFieldChange}
             setSelectedPage={setSelectedPage}
             isCollapsed={isCollapsed}

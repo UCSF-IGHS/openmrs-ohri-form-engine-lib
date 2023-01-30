@@ -24,7 +24,7 @@ export const supportsUnspecified = question => {
     question.questionOptions.rendering != 'encounter-location'
   );
 };
-const OHRIFormSection = ({ sessionMode, fields, onFieldChange }) => {
+const OHRIFormSection = ({ fields, onFieldChange }) => {
   const [fieldToControlMap, setFieldToControlMap] = useState([]);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const OHRIFormSection = ({ sessionMode, fields, onFieldChange }) => {
             return supportsUnspecified(field) && field.questionOptions.rendering != 'group' ? (
               <div key={index}>
                 {qnFragment}
-                <OHRIUnspecified question={field} sessionMode={sessionMode} />
+                <OHRIUnspecified question={field} />
               </div>
             ) : (
               <div key={index}>{qnFragment}</div>

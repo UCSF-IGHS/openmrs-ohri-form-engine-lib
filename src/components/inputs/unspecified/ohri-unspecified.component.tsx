@@ -9,12 +9,11 @@ import { isTrue } from '../../../utils/boolean-utils';
 
 export const OHRIUnspecified: React.FC<{
   question: OHRIFormField;
-  sessionMode?: SessionMode;
-}> = ({ question, sessionMode }) => {
+}> = ({ question }) => {
   const [field, meta] = useField(`${question.id}-unspecified`);
-  const { setFieldValue } = React.useContext(OHRIFormContext);
+  const { setFieldValue, encounterContext } = React.useContext(OHRIFormContext);
   const [previouslyUnspecified, setPreviouslyUnspecified] = useState(false);
-  const [hideCheckBox, setHideCheckBox] = useState(false);
+  const hideCheckBox = encounterContext.sessionMode == 'view';
 
   useEffect(() => {
     if (field.value) {
@@ -44,9 +43,6 @@ export const OHRIUnspecified: React.FC<{
   useEffect(() => {
     if (question.value) {
       setFieldValue(`${question.id}-unspecified`, false);
-      if (sessionMode == 'view') {
-        setHideCheckBox(true);
-      }
     }
   }, [question.value]);
 
