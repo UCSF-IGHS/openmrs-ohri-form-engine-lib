@@ -17,7 +17,7 @@ import OHRIFormSidebar from './components/sidebar/ohri-form-sidebar.component';
 import { OHRIEncounterForm } from './components/encounter/ohri-encounter-form';
 import { isTrue } from './utils/boolean-utils';
 import { useWorkspaceLayout } from './utils/useWorkspaceLayout';
-import { Button } from '@carbon/react';
+import { Button, ProgressBar } from '@carbon/react';
 import ReactMarkdown from 'react-markdown';
 import { PatientBanner } from './components/patient-banner/patient-banner.component';
 import LoadingIcon from './components/loading/loading.component';
@@ -64,6 +64,7 @@ const OHRIForm: React.FC<OHRIFormProps> = ({
   const handlers = new Map<string, FormSubmissionHandler>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pagesWithErrors, setPagesWithErrors] = useState([]);
+  const [isFormLoading, setIsFormLoading] = useState(true);
   const postSubmissionHandler = usePostSubmissionAction(formJson.postSubmissionAction);
 
   const form = useMemo(() => {
@@ -216,9 +217,11 @@ const OHRIForm: React.FC<OHRIFormProps> = ({
             <LoadingIcon />
           ) : (
             <div className={styles.ohriFormContainer}>
-              <div className={styles.ohriFormBody}>
-                <LinearLoader />
-              </div>
+              {isFormLoading && sessionMode == 'edit' && (
+                <div className={styles.ohriFormBody}>
+                  <LinearLoader />
+                </div>
+              )}
               <div className={styles.ohriFormBody}>
                 {showSideBar && (
                   <OHRIFormSidebar
@@ -235,7 +238,6 @@ const OHRIForm: React.FC<OHRIFormProps> = ({
                     defaultPage={formJson.defaultPage}
                   />
                 )}
-
                 <div className={styles.formContent}>
                   {workspaceLayout != 'minimized' && <PatientBanner patient={patient} hideActionsOverflow={true} />}
                   {form.markdown && (
@@ -261,6 +263,7 @@ const OHRIForm: React.FC<OHRIFormProps> = ({
                       allInitialValues={initialValues}
                       setScrollablePages={setScrollablePages}
                       setPagesWithErrors={setPagesWithErrors}
+                      setIsFormLoading={setIsFormLoading}
                       setFieldValue={props.setFieldValue}
                       setSelectedPage={setSelectedPage}
                       handlers={handlers}
