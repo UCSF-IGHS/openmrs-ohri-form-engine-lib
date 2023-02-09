@@ -22,7 +22,7 @@ import OHRIFormPage from '../page/ohri-form-page';
 import { InstantEffect } from '../../utils/instant-effect';
 import { FormSubmissionHandler } from '../../ohri-form.component';
 import { isTrue } from '../../utils/boolean-utils';
-import { evaluateExpression } from '../../utils/expression-runner';
+import { evaluateExpression, evaluateAsyncExpression } from '../../utils/expression-runner';
 import { getPreviousEncounter, saveEncounter } from '../../api/api';
 import { scrollIntoView } from '../../utils/ohri-sidebar';
 
@@ -210,7 +210,20 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
               patient,
             },
           );
+          //check if result is a promise
+          if (result instanceof Promise) {
+            result.then(res => {
+              if (!isEmpty(res)) {
+                tempInitVals[field.id] = res;
+                getHandler(field.type).handleFieldSubmission(field, res, encounterContext);
+              }
+            });
+          } else {
+            // handle non promise
+          }
+
           if (!isEmpty(result)) {
+            // add handler for async
             tempInitVals[field.id] = result;
             getHandler(field.type).handleFieldSubmission(field, result, encounterContext);
           }

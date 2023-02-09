@@ -2,6 +2,7 @@ import moment from 'moment';
 import { ConceptFalse, ConceptTrue } from '../constants';
 import { OHRIFormField, OHRIFormPage, OHRIFormSection } from '../api/types';
 import { isEmpty as isValueEmpty } from '../validators/ohri-form-validator';
+import { fetchPatientObsByConcept } from '../api/api';
 
 export interface FormNode {
   value: OHRIFormPage | OHRIFormSection | OHRIFormField;
@@ -122,6 +123,11 @@ export function evaluateExpression(
     return height && weight ? parseFloat(r) : null;
   }
 
+  /**
+   * Expected date of delivery
+   * @param lmpQuestionId
+   * @returns
+   */
   function calcEDD(lmpQuestionId) {
     const lmp = allFieldValues[lmpQuestionId];
     [lmpQuestionId].forEach(entry => {
@@ -245,6 +251,64 @@ export function evaluateExpression(
     let birthDate = new Date(patient.birthDate).getFullYear();
     let calculatedYear = targetYear - birthDate;
     return calculatedYear;
+  }
+
+  function checkValueExists(questionId, obsCollection) {
+    const value = allFieldValues[questionId];
+
+    obsCollection.find(obs => {
+      if (obs.concept == value) {
+        return true;
+      }
+    });
+  }
+
+  parts.forEach((part, index) => {
+    if (index % 2 == 0) {
+      if (allFieldsKeys.includes(part)) {
+        const determinant = allFields.find(field => field.id === part);
+        registerDependency(node, determinant);
+        // prep eval variables
+        let determinantValue = allFieldValues[part];
+        if (determinant.questionOptions.rendering == 'toggle' && typeof determinantValue == 'boolean') {
+          determinantValue = determinantValue ? ConceptTrue : ConceptFalse;
+        }
+        if (typeof determinantValue == 'string') {
+          determinantValue = `'${determinantValue}'`;
+        }
+        const regx = new RegExp(part, 'g');
+        expression = expression.replace(regx, determinantValue);
+      }
+    }
+  });
+  try {
+    return eval(expression);
+  } catch (error) {
+    console.error(error);
+  }
+  return null;
+}
+
+export async function evaluateAsyncExpression(
+  expression: string,
+  node: FormNode,
+  allFields: Array<OHRIFormField>,
+  allFieldValues: Record<string, any>,
+  context: ExpressionContext,
+): any {
+  const allFieldsKeys = allFields.map(f => f.id);
+  const parts = expression.trim().split(' ');
+  const { mode, myValue, patient } = context;
+
+  async function getObsFromPatientEncounter(conceptUuid: string, encounterUuid: string) {
+    return await fetchPatientObsByConcept(encounterUuid, conceptUuid, patient.uuid).then(response => {
+      console.log('Response: ', response);
+      if (response.length > 0) {
+        return response[0].value;
+      } else {
+        return [];
+      }
+    });
   }
 
   parts.forEach((part, index) => {

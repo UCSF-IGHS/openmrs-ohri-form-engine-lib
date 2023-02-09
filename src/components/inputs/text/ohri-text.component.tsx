@@ -16,6 +16,7 @@ const OHRIText: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler })
   const { setFieldValue, encounterContext, layoutType, workspaceLayout, fields } = React.useContext(OHRIFormContext);
   const [previousValue, setPreviousValue] = useState();
   const [errors, setErrors] = useState([]);
+  const [warnings, setWarnings] = useState([]);
   const [conceptName, setConceptName] = useState('Loading...');
   const isFieldRequiredError = useMemo(() => errors[0]?.errCode == fieldRequiredErrCode, [errors]);
   const [previousValueForReview, setPreviousValueForReview] = useState(null);
