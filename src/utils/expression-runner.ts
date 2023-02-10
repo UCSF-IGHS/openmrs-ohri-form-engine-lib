@@ -295,14 +295,12 @@ export async function evaluateAsyncExpression(
   allFields: Array<OHRIFormField>,
   allFieldValues: Record<string, any>,
   context: ExpressionContext,
-): any {
+): Promise<any> {
   const allFieldsKeys = allFields.map(f => f.id);
   const parts = expression.trim().split(' ');
   const { mode, myValue, patient } = context;
-
   async function getObsFromPatientEncounter(conceptUuid: string, encounterUuid: string) {
     return await fetchPatientObsByConcept(encounterUuid, conceptUuid, patient.uuid).then(response => {
-      console.log('Response: ', response);
       if (response.length > 0) {
         return response[0].value;
       } else {
@@ -310,7 +308,7 @@ export async function evaluateAsyncExpression(
       }
     });
   }
-
+  const lazyFragments = [];
   parts.forEach((part, index) => {
     if (index % 2 == 0) {
       if (allFieldsKeys.includes(part)) {
@@ -328,13 +326,41 @@ export async function evaluateAsyncExpression(
         expression = expression.replace(regx, determinantValue);
       }
     }
+    if (part.startsWith('resolve(')) {
+      lazyFragments.push({ fragment: part, index });
+    }
   });
+
+  console.log({ lazyFragments, parts });
+
+  // resolve lazy fragments
+  const fragments = await Promise.all(lazyFragments.map(({ fragment }) => eval(fragment)));
+  lazyFragments.forEach(fragment => {
+    console.log({ willReplace: parts[fragment.index], with: fragments[fragment.index] });
+    expression = expression.replace(
+      parts[fragment.index],
+      typeof fragments[fragment.index] == 'string' ? `'${fragments[fragment.index]}'` : fragments[fragment.index],
+    );
+  });
+  console.log({ expression });
   try {
     return eval(expression);
   } catch (error) {
     console.error(error);
   }
   return null;
+}
+
+function getFuzzyValue(id) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve('Fuzzy value');
+    }, 5000);
+  });
+}
+
+function resolve(lazy) {
+  return Promise.resolve(lazy);
 }
 
 function registerDependency(node: FormNode, determinant: OHRIFormField) {
