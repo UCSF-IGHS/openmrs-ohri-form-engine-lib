@@ -274,11 +274,6 @@ export function evaluateExpression(
     }
   });
   try {
-    if (expression.startsWith('myValue')) {
-      console.log(expression);
-      console.log(eval(expression));
-    }
-
     return eval(expression);
   } catch (error) {
     console.error(error);
