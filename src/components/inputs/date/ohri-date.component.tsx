@@ -17,6 +17,7 @@ const OHRIDate: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler })
   const [field, meta] = useField(question.id);
   const { setFieldValue, encounterContext, layoutType, workspaceLayout, fields } = React.useContext(OHRIFormContext);
   const [errors, setErrors] = useState([]);
+  const [warnings, setWarnings] = useState([]);
   const [conceptName, setConceptName] = useState('Loading...');
   const isFieldRequiredError = useMemo(() => errors[0]?.errCode == fieldRequiredErrCode, [errors]);
   const [previousValueForReview, setPreviousValueForReview] = useState(null);
@@ -164,7 +165,7 @@ const OHRIDate: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler })
                 onChange={e => onDateChange([moment(e.target.value, ['YYYY-MM-DD', 'DD/MM/YYYY']).toDate()])}
                 disabled={question.disabled}
                 invalid={!isFieldRequiredError && errors.length > 0}
-                invalidText={errors[0]?.errMessage}
+                invalidText={errors[0]?.message}
               />
             </DatePicker>
           </div>

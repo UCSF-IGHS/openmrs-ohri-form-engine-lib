@@ -22,10 +22,11 @@ import OHRIFormPage from '../page/ohri-form-page';
 import { InstantEffect } from '../../utils/instant-effect';
 import { FormSubmissionHandler } from '../../ohri-form.component';
 import { isTrue } from '../../utils/boolean-utils';
-import { evaluateExpression } from '../../utils/expression-runner';
+import { evaluateExpression, evaluateAsyncExpression } from '../../utils/expression-runner';
 import { getPreviousEncounter, saveEncounter } from '../../api/api';
 import { scrollIntoView } from '../../utils/ohri-sidebar';
 import { useEncounter } from '../../hooks/useEncounter';
+import { useInitialValues } from '../../hooks/useInitialValues';
 
 interface OHRIEncounterFormProps {
   formJson: OHRIFormSchema;
@@ -76,10 +77,54 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
   const [previousEncounter, setPreviousEncounter] = useState<OpenmrsEncounter>(null);
   const [form, setForm] = useState<OHRIFormSchema>(formJson);
   const [obsGroupsToVoid, setObsGroupsToVoid] = useState([]);
-  const [formInitialValues, setFormInitialValues] = useState({});
   const [isFieldInitializationComplete, setIsFieldInitializationComplete] = useState(false);
   const layoutType = useLayoutType();
+  const encounterContext = useMemo(
+    () => ({
+      patient: patient,
+      encounter: encounter,
+      previousEncounter,
+      location: location,
+      sessionMode: sessionMode || (form?.encounter ? 'edit' : 'enter'),
+      date: encounterDate,
+    }),
+    [encounter, encounterDate, form?.encounter, location, patient, previousEncounter, sessionMode],
+  );
 
+  const rawFormFields = useMemo(() => {
+    const ret = [];
+    form.pages.forEach(page =>
+      page.sections.forEach(section => {
+        section.questions.forEach(question => {
+          // explicitly set blank values to null
+          // TODO: shouldn't we be setting to the default behaviour?
+          section.inlineRendering = isEmpty(section.inlineRendering) ? null : section.inlineRendering;
+          page.inlineRendering = isEmpty(page.inlineRendering) ? null : page.inlineRendering;
+          form.inlineRendering = isEmpty(form.inlineRendering) ? null : form.inlineRendering;
+          question.inlineRendering = section.inlineRendering ?? page.inlineRendering ?? form.inlineRendering;
+          evaluateFieldReadonlyProp(question, section.readonly, page.readonly, form.readonly);
+          if (question.questionOptions.rendering == 'fixed-value' && !question['fixedValue']) {
+            question['fixedValue'] = question.value;
+          }
+          ret.push(question);
+          if (question.type == 'obsGroup') {
+            question.questions.forEach(groupedField => {
+              // set group id
+              groupedField['groupId'] = question.id;
+              ret.push(groupedField);
+            });
+          }
+        });
+      }),
+    );
+    return ret;
+  }, []);
+
+  const { initialValues: tempInitialValues, isFieldEncounterBindingComplete } = useInitialValues(
+    rawFormFields,
+    encounter,
+    encounterContext,
+  );
   const addScrollablePages = useCallback(() => {
     formJson.pages.forEach(page => {
       if (!page.isSubform) {
@@ -95,18 +140,6 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
     };
   }, [scrollablePages, formJson]);
 
-  const encounterContext = useMemo(
-    () => ({
-      patient: patient,
-      encounter: encounter,
-      previousEncounter,
-      location: location,
-      sessionMode: sessionMode || (form?.encounter ? 'edit' : 'enter'),
-      date: encounterDate,
-    }),
-    [encounter, encounterDate, form?.encounter, location, patient, previousEncounter, sessionMode],
-  );
-
   useEffect(() => {
     if (!encounterLocation && location) {
       setEncounterLocation(location);
@@ -114,136 +147,55 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
   }, [location]);
 
   useEffect(() => {
-    const allFormFields: Array<OHRIFormField> = [];
-    const tempInitVals = {};
-    let isFieldEncounterBindingComplete = false;
-    form.pages.forEach(page =>
-      page.sections.forEach(section => {
-        section.questions.forEach(question => {
-          // explicitly set blank values to null
-          // TODO: shouldn't we be setting to the default behaviour?
-          section.inlineRendering = isEmpty(section.inlineRendering) ? null : section.inlineRendering;
-          page.inlineRendering = isEmpty(page.inlineRendering) ? null : page.inlineRendering;
-          form.inlineRendering = isEmpty(form.inlineRendering) ? null : form.inlineRendering;
-          question.inlineRendering = section.inlineRendering ?? page.inlineRendering ?? form.inlineRendering;
-          evaluateFieldReadonlyProp(question, section.readonly, page.readonly, form.readonly);
-          if (question.questionOptions.rendering == 'fixed-value' && !question['fixedValue']) {
-            question['fixedValue'] = question.value;
+    if (tempInitialValues && Object.keys(tempInitialValues).length) {
+      setFields(
+        rawFormFields.map(field => {
+          if (field.hide) {
+            evalHide({ value: field, type: 'field' }, rawFormFields, tempInitialValues);
+          } else {
+            field.isHidden = false;
           }
-          allFormFields.push(question);
-          if (question.type == 'obsGroup') {
-            question.questions.forEach(groupedField => {
-              // set group id
-              groupedField['groupId'] = question.id;
-              allFormFields.push(groupedField);
-            });
+          if (typeof field.readonly == 'string' && field.readonly?.split(' ')?.length > 1) {
+            // needed to store the expression for further evaluations
+            field['readonlyExpression'] = field.readonly;
+            field.readonly = evaluateExpression(
+              field.readonly,
+              { value: field, type: 'field' },
+              rawFormFields,
+              tempInitialValues,
+              {
+                mode: sessionMode,
+                patient,
+              },
+            );
+          }
+          return field;
+        }),
+      );
+
+      form.pages.forEach(page => {
+        if (page.hide) {
+          evalHide({ value: page, type: 'page' }, rawFormFields, tempInitialValues);
+        } else {
+          page.isHidden = false;
+        }
+        page.sections.forEach(section => {
+          if (section.hide) {
+            evalHide({ value: section, type: 'section' }, rawFormFields, tempInitialValues);
+          } else {
+            section.isHidden = false;
           }
         });
-      }),
-    );
-    // set Formik initial values
-    if (encounter) {
-      allFormFields.forEach(field => {
-        const handler = getHandler(field.type);
-        let existingVal = handler?.getInitialValue(encounter, field, allFormFields);
-        if (isEmpty(existingVal) && !isEmpty(field.questionOptions.defaultValue)) {
-          existingVal = inferInitialValueFromDefaultFieldValue(field, encounterContext, handler);
-        }
-        tempInitVals[field.id] = existingVal === null || existingVal === undefined ? '' : existingVal;
-        if (field.unspecified) {
-          tempInitVals[`${field.id}-unspecified`] = !!!existingVal;
-        }
       });
-      setEncounterLocation(encounter.location);
-      isFieldEncounterBindingComplete = true;
-    } else {
-      const emptyValues = {
-        checkbox: [],
-        toggle: false,
-        default: '',
-      };
-      allFormFields.forEach(field => {
-        let value = null;
-        if (!isEmpty(field.questionOptions.defaultValue)) {
-          value = inferInitialValueFromDefaultFieldValue(field, encounterContext, getHandler(field.type));
-        }
-        if (!isEmpty(value)) {
-          tempInitVals[field.id] = value;
-        } else {
-          tempInitVals[field.id] =
-            emptyValues[field.questionOptions.rendering] != undefined
-              ? emptyValues[field.questionOptions.rendering]
-              : emptyValues.default;
-        }
-        if (field.unspecified) {
-          tempInitVals[`${field.id}-unspecified`] = false;
-        }
-      });
-    }
-    // prepare fields
-    setFields(
-      allFormFields.map(field => {
-        if (field.hide) {
-          evalHide({ value: field, type: 'field' }, allFormFields, tempInitVals);
-        } else {
-          field.isHidden = false;
-        }
-        if (typeof field.readonly == 'string' && field.readonly?.split(' ')?.length > 1) {
-          // needed to store the expression for further evaluations
-          field['readonlyExpression'] = field.readonly;
-          field.readonly = evaluateExpression(
-            field.readonly,
-            { value: field, type: 'field' },
-            allFormFields,
-            tempInitVals,
-            {
-              mode: sessionMode,
-              patient,
-            },
-          );
-        }
-        if (field.questionOptions.calculate?.calculateExpression) {
-          const result = evaluateExpression(
-            field.questionOptions.calculate.calculateExpression,
-            { value: field, type: 'field' },
-            allFormFields,
-            tempInitVals,
-            {
-              mode: sessionMode,
-              patient,
-            },
-          );
-          if (!isEmpty(result)) {
-            tempInitVals[field.id] = result;
-            getHandler(field.type).handleFieldSubmission(field, result, encounterContext);
-          }
-        }
-        return field;
-      }),
-    );
-    form.pages.forEach(page => {
-      if (page.hide) {
-        evalHide({ value: page, type: 'page' }, allFormFields, tempInitVals);
-      } else {
-        page.isHidden = false;
+      setForm(form);
+      setAllInitialValues({ ...allInitialValues, ...tempInitialValues });
+      if (sessionMode == 'enter') {
+        setIsFieldInitializationComplete(true);
+      } else if (isFieldEncounterBindingComplete) {
+        setIsFieldInitializationComplete(true);
       }
-      page.sections.forEach(section => {
-        if (section.hide) {
-          evalHide({ value: section, type: 'section' }, allFormFields, tempInitVals);
-        } else {
-          section.isHidden = false;
-        }
-      });
-    });
-    setForm(form);
-    setFormInitialValues(tempInitVals);
-    setAllInitialValues({ ...allInitialValues, ...tempInitVals });
-    if (sessionMode == 'enter') {
-      setIsFieldInitializationComplete(true);
-    } else if (isFieldEncounterBindingComplete) {
-      setIsFieldInitializationComplete(true);
     }
-  }, [encounter]);
+  }, [tempInitialValues]);
 
   useEffect(() => {
     if (sessionMode == 'enter') {

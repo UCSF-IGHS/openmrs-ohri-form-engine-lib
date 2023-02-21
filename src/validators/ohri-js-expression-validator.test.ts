@@ -33,7 +33,7 @@ describe('OHRIJSExpressionValidator - validate', () => {
 
     // verify
     expect(errors).toEqual([
-      { errCode: 'value.invalid', errMessage: 'Atleast one type of Prevention Services must be selected' },
+      { errCode: 'value.invalid', message: 'Atleast one type of Prevention Services must be selected' },
     ]);
 
     // provide some value(s) for Prevention Services
@@ -82,7 +82,7 @@ describe('OHRIJSExpressionValidator - validate', () => {
 
     // verify
     expect(errors).toEqual([
-      { errCode: 'value.invalid', errMessage: "Value cannot be before '2020-12-01' or after today" },
+      { errCode: 'value.invalid', message: "Value cannot be before '2020-12-01' or after today" },
     ]);
 
     // set & replay
@@ -97,7 +97,7 @@ describe('OHRIJSExpressionValidator - validate', () => {
 
     // verify
     expect(errors).toEqual([
-      { errCode: 'value.invalid', errMessage: "Value cannot be before '2020-12-01' or after today" },
+      { errCode: 'value.invalid', message: "Value cannot be before '2020-12-01' or after today" },
     ]);
 
     // replay

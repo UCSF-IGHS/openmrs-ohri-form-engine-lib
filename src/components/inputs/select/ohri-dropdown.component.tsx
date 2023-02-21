@@ -85,7 +85,7 @@ const OHRIDropdown: React.FC<OHRIFormFieldProps> = ({ question, onChange, handle
             onChange={({ selectedItem }) => handleChange(selectedItem)}
             disabled={question.disabled}
             invalid={!isFieldRequiredError && errors.length > 0}
-            invalidText={errors.length && errors[0].errMessage}
+            invalidText={errors.length && errors[0].message}
           />
         </div>
         {previousValueForReview && (

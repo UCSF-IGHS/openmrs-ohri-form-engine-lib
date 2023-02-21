@@ -43,3 +43,10 @@ export function fetchConceptNameByUuid(conceptUuid: string) {
     }
   });
 }
+
+export function fetchPatientObsByConcept(encounterTypeUuid: string, conceptUuid: string, patientUuid: string) {
+  const query = `patient=${patientUuid}&concept=${conceptUuid}`;
+  return openmrsFetch(`/ws/rest/v1/obs?${query}&v=full`).then(({ data }) => {
+    return data.results;
+  });
+}
