@@ -209,8 +209,8 @@ const OHRIForm: React.FC<OHRIFormProps> = ({
           }
           // Post Submission Actions
           if (postSubmissionHandlers) {
-            await Promise.resolve(
-              postSubmissionHandlers.forEach(handler => {
+            await Promise.all(
+              postSubmissionHandlers.map(handler => {
                 handler.applyAction({
                   patient,
                   sessionMode,
