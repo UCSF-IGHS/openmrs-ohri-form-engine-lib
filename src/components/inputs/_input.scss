@@ -149,6 +149,15 @@
   color: #da1e28;
 }
 
+.warningLabel :global(.cds--form-requirement) {
+  display: block;
+  max-height: 12.5rem;
+  overflow: visible;
+  font-weight: 400;
+  // color: #f1c21b; This is from bootstrap but Carbon defaults to black
+  color: $text-02;
+}
+
 .obsGroupColumn {
   max-width: 18rem;
 }

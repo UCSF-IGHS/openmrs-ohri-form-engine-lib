@@ -9,12 +9,12 @@ import {
   OHRIFormSchema,
   OpenmrsEncounter,
   SessionMode,
+  ValidationResult,
 } from '../../api/types';
 import {
   cascadeVisibityToChildFields,
   evaluateFieldReadonlyProp,
   findPagesWithErrors,
-  inferInitialValueFromDefaultFieldValue,
   voidObsValueOnFieldHidden,
 } from '../../utils/ohri-form-helper';
 import { isEmpty, isEmpty as isValueEmpty, OHRIFieldValidator } from '../../validators/ohri-form-validator';
@@ -22,7 +22,7 @@ import OHRIFormPage from '../page/ohri-form-page';
 import { InstantEffect } from '../../utils/instant-effect';
 import { FormSubmissionHandler } from '../../ohri-form.component';
 import { isTrue } from '../../utils/boolean-utils';
-import { evaluateExpression, evaluateAsyncExpression } from '../../utils/expression-runner';
+import { evaluateExpression } from '../../utils/expression-runner';
 import { getPreviousEncounter, saveEncounter } from '../../api/api';
 import { scrollIntoView } from '../../utils/ohri-sidebar';
 import { useEncounter } from '../../hooks/useEncounter';
@@ -78,6 +78,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
   const [form, setForm] = useState<OHRIFormSchema>(formJson);
   const [obsGroupsToVoid, setObsGroupsToVoid] = useState([]);
   const [isFieldInitializationComplete, setIsFieldInitializationComplete] = useState(false);
+  const [invalidFields, setInvalidFields] = useState([]);
   const layoutType = useLayoutType();
   const encounterContext = useMemo(
     () => ({
@@ -125,6 +126,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
     encounter,
     encounterContext,
   );
+
   const addScrollablePages = useCallback(() => {
     formJson.pages.forEach(page => {
       if (!page.isSubform) {
@@ -263,21 +265,20 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
     }
   }, []);
 
-  const [invalidFields, setInvalidFields] = useState([]);
-
   useEffect(() => {
     if (invalidFields?.length) {
       setPagesWithErrors(findPagesWithErrors(scrollablePages, invalidFields));
-      let firstInvalidField = invalidFields[0];
-      let answerOptionid: string;
-      if (firstInvalidField.questionOptions.rendering === 'radio') {
-        answerOptionid = `${firstInvalidField.id}-${firstInvalidField.questionOptions.answers[0].label}`;
-        scrollIntoView(answerOptionid, true);
-      } else if (firstInvalidField.questionOptions.rendering === 'checkbox') {
-        answerOptionid = `${firstInvalidField.label}-input`;
-        scrollIntoView(answerOptionid, true);
-      } else {
-        scrollIntoView(firstInvalidField.id, true);
+      switch (invalidFields[0].questionOptions.rendering) {
+        case 'radio':
+          const firstRadioGroupMemberDomId = `${invalidFields[0].id}-${invalidFields[0].questionOptions.answers[0].label}`;
+          scrollIntoView(firstRadioGroupMemberDomId, true);
+          break;
+        case 'checkbox':
+          scrollIntoView(`${invalidFields[0].label}-input`, true);
+          break;
+        default:
+          scrollIntoView(invalidFields[0].id, true);
+          break;
       }
     }
   }, [invalidFields]);
@@ -291,7 +292,9 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
         .filter(field => !field.isParentHidden && !field.disabled && !field.isHidden && !isTrue(field.readonly))
         .filter(field => field['submission']?.unspecified != true)
         .forEach(field => {
-          const errors = OHRIFieldValidator.validate(field, values[field.id]);
+          const errors = OHRIFieldValidator.validate(field, values[field.id]).filter(
+            error => error.resultType == 'error',
+          );
           if (errors.length) {
             errorFields.push(field);
             field['submission'] = {
@@ -385,7 +388,12 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
     }
   };
 
-  const onFieldChange = (fieldName: string, value: any, setErrors) => {
+  const onFieldChange = (
+    fieldName: string,
+    value: any,
+    setErrors: (errors: Array<ValidationResult>) => void,
+    setWarnings: (warnings: Array<ValidationResult>) => void,
+  ) => {
     const field = fields.find(field => field.id == fieldName);
     const validators = Array.isArray(field.validators)
       ? [{ type: 'OHRIBaseValidator' }, ...field.validators]
@@ -396,18 +404,21 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
       values: { ...values, [fieldName]: value },
       fields,
     };
+    const errors = [];
+    const warnings = [];
     for (let validatorConfig of validators) {
-      const errors =
+      const errorsAndWarinings =
         getValidator(validatorConfig.type)?.validate(field, value, { ...basevalidatorConfig, ...validatorConfig }) ||
         [];
-      setErrors && setErrors(errors);
-      if (errors.length) {
-        setInvalidFields(invalidFields => [...invalidFields, field]);
-        return;
-      } else {
-        setInvalidFields(invalidFields => invalidFields.filter(item => item !== field));
-      }
-      setPagesWithErrors(findPagesWithErrors(scrollablePages, invalidFields));
+      errors.push(...errorsAndWarinings.filter(error => error.resultType == 'error'));
+      warnings.push(...errorsAndWarinings.filter(error => error.resultType == 'warning'));
+    }
+    setErrors?.(errors);
+    setWarnings?.(warnings);
+    if (errors.length) {
+      setInvalidFields(invalidFields => [...invalidFields, field]);
+    } else {
+      setInvalidFields(invalidFields => invalidFields.filter(item => item !== field));
     }
     if (field.questionOptions.rendering == 'toggle') {
       value = value ? ConceptTrue : ConceptFalse;

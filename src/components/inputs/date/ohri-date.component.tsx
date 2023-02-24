@@ -24,8 +24,9 @@ const OHRIDate: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler })
   const [time, setTime] = useState('');
 
   useEffect(() => {
-    if (question['submission']?.errors) {
-      setErrors(question['submission']?.errors);
+    if (question['submission']) {
+      question['submission'].erros && setErrors(question['submission'].errors);
+      question['submission'].warnings && setWarnings(question['submission'].warnings);
     }
   }, [question['submission']]);
 
@@ -39,7 +40,7 @@ const OHRIDate: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler })
   const onDateChange = ([date]) => {
     const refinedDate = date instanceof Date ? new Date(date.getTime() - date.getTimezoneOffset() * 60000) : date;
     setFieldValue(question.id, refinedDate);
-    onChange(question.id, refinedDate, setErrors);
+    onChange(question.id, refinedDate, setErrors, setWarnings);
     onTimeChange(false, true);
     question.value = handler.handleFieldSubmission(question, refinedDate, encounterContext);
   };
@@ -56,7 +57,7 @@ const OHRIDate: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler })
       const splitTime = time.split(':');
       currentDateTime.setHours(splitTime[0] ?? '00', splitTime[1] ?? '00');
       setFieldValue(question.id, currentDateTime);
-      onChange(question.id, currentDateTime, setErrors);
+      onChange(question.id, currentDateTime, setErrors, setWarnings);
       question.value = handler.handleFieldSubmission(question, currentDateTime, encounterContext);
       setTime(time);
     }
@@ -159,13 +160,15 @@ const OHRIDate: React.FC<OHRIFormFieldProps> = ({ question, onChange, handler })
                 }
                 // Added for testing purposes.
                 // Notes:
-                // Something is strange is happening with the way events are propagated and handled by Carbon.
+                // Something strange is happening with the way events are propagated and handled by Carbon.
                 // When we manually trigger an onchange event using the 'fireEvent' lib, the handler below will
                 // be triggered as opposed to the former hanlder that only gets triggered at runtime.
                 onChange={e => onDateChange([moment(e.target.value, ['YYYY-MM-DD', 'DD/MM/YYYY']).toDate()])}
                 disabled={question.disabled}
                 invalid={!isFieldRequiredError && errors.length > 0}
                 invalidText={errors[0]?.message}
+                warn={warnings.length > 0}
+                warnText={warnings[0]?.message}
               />
             </DatePicker>
           </div>

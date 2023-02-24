@@ -8,7 +8,11 @@ import { useField } from 'formik';
 
 export const getFieldControl = (question: OHRIFormField) => {
   // Check if a concept wasn't provided
-  if (question.type == 'obs' && !question.questionOptions.concept) {
+  if (
+    question.type == 'obs' &&
+    !question.questionOptions.concept &&
+    question.questionOptions.rendering !== 'fixed-value'
+  ) {
     // Disable the control
     question.disabled = true;
     // Since we don't have a concept, just render a text input

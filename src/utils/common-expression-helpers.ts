@@ -3,6 +3,7 @@ import moment from 'moment';
 import { OHRIFormField } from '../api/types';
 import { FormNode } from './expression-runner';
 import { isEmpty as isValueEmpty } from '../validators/ohri-form-validator';
+import * as apiFunctions from '../api/api';
 
 export class CommonExpressionHelpers {
   node: FormNode = null;
@@ -10,6 +11,7 @@ export class CommonExpressionHelpers {
   allFields: OHRIFormField[] = [];
   allFieldValues: Record<string, any> = {};
   allFieldsKeys: string[] = [];
+  api = apiFunctions;
 
   constructor(
     node: FormNode,

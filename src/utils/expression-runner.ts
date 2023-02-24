@@ -69,6 +69,7 @@ export async function evaluateAsyncExpression(
   // setup function scope
   const { mode, myValue, patient } = context;
   const {
+    api,
     isEmpty,
     today,
     includes,
@@ -93,18 +94,26 @@ export async function evaluateAsyncExpression(
         expression = interpolateFieldValue(node, expression, allFields, allFieldValues, part);
       }
       if (part.startsWith('resolve(')) {
-        lazyFragments.push({ expression: part, index });
+        const [refinedSubExpression] = checkReferenceToResolvedFragment(part);
+        lazyFragments.push({ expression: refinedSubExpression, index });
       }
     }
   });
 
+  const temporaryObjectsMap = {};
   // resolve lazy fragments
   const fragments = await Promise.all(lazyFragments.map(({ expression }) => eval(expression)));
   lazyFragments.forEach((fragment, index) => {
-    expression = expression.replace(
-      fragment.expression,
-      typeof fragments[index] == 'string' ? `'${fragments[index]}'` : fragments[index],
-    );
+    if (typeof fragments[index] == 'object') {
+      const objectKey = `obj_${index}`;
+      temporaryObjectsMap[objectKey] = fragments[index];
+      expression = expression.replace(fragment.expression, `temporaryObjectsMap.${objectKey}`);
+    } else {
+      expression = expression.replace(
+        fragment.expression,
+        typeof fragments[index] == 'string' ? `'${fragments[index]}'` : fragments[index],
+      );
+    }
   });
 
   try {
@@ -118,7 +127,7 @@ export async function evaluateAsyncExpression(
 /**
  * Used as wrapper around async functions. It basically evaluates the promised value.
  */
-function resolve(lazy: Promise<any>) {
+export function resolve(lazy: Promise<any>) {
   return Promise.resolve(lazy);
 }
 
@@ -160,4 +169,18 @@ function mockAsyncFunction(value: any, delay?: number) {
       resolve(value);
     }, delay || 1000);
   });
+}
+
+/**
+ * Checks if the given token contains a reference to a resolved fragment
+ * and returns the fragment and the remaining chained reference.
+ * @param token - The token to check.
+ * @returns An array containing the resolved fragment and the remaining chained reference.
+ */
+export function checkReferenceToResolvedFragment(token: string) {
+  // Match the substring that starts with the keyword "resolve" and continues until
+  // the closing parenthesis of the inner function call.
+  const match = token.match(/resolve\((.*)\)/) || [];
+  const chainedRef = match.length ? token.substring(token.indexOf(match[0]) + match[0].length) : '';
+  return [match[0] || '', chainedRef];
 }

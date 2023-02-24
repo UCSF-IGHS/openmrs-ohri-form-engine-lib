@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
-import { inferInitialValueFromDefaultFieldValue, isEmpty } from '..';
+import { EncounterContext, inferInitialValueFromDefaultFieldValue, isEmpty } from '..';
 import { OHRIFormField, OpenmrsEncounter } from '../api/types';
 import { getHandler } from '../registry/registry';
 import { evaluateAsyncExpression } from '../utils/expression-runner';
 
-export function useInitialValues(formFields: OHRIFormField[], encounter: OpenmrsEncounter, encounterContext) {
+export function useInitialValues(
+  formFields: OHRIFormField[],
+  encounter: OpenmrsEncounter,
+  encounterContext: EncounterContext,
+) {
   const [asyncInitValues, setAsyncInitValues] = useState<Record<string, Promise<any>>>({});
   const [isFieldEncounterBindingComplete, setIsFieldEncounterBindingComplete] = useState(false);
-  const [initialValues, setInitialValues] = useState([]);
-  const tempInitVals = {};
+  const [initialValues, setInitialValues] = useState({});
 
   useEffect(() => {
     const asyncItemsKeys = Object.keys(asyncInitValues);
@@ -16,9 +19,12 @@ export function useInitialValues(formFields: OHRIFormField[], encounter: Openmrs
       asyncItemsKeys.forEach((key, index) => {
         if (!isEmpty(results[index])) {
           initialValues[key] = results[index];
-
-          // TODO: fix below
-          // getHandler(field.type).handleFieldSubmission(field, result, encounterContext);
+          const field = formFields.find(field => field.id === key);
+          try {
+            getHandler(field.type).handleFieldSubmission(field, results[index], encounterContext);
+          } catch (error) {
+            console.error(error);
+          }
         }
       });
       setInitialValues({ ...initialValues });
@@ -33,9 +39,9 @@ export function useInitialValues(formFields: OHRIFormField[], encounter: Openmrs
         if (isEmpty(existingVal) && !isEmpty(field.questionOptions.defaultValue)) {
           existingVal = inferInitialValueFromDefaultFieldValue(field, encounterContext, handler);
         }
-        tempInitVals[field.id] = existingVal === null || existingVal === undefined ? '' : existingVal;
+        initialValues[field.id] = existingVal === null || existingVal === undefined ? '' : existingVal;
         if (field.unspecified) {
-          tempInitVals[`${field.id}-unspecified`] = !!!existingVal;
+          initialValues[`${field.id}-unspecified`] = !!!existingVal;
         }
       });
       setIsFieldEncounterBindingComplete(true);
@@ -48,11 +54,12 @@ export function useInitialValues(formFields: OHRIFormField[], encounter: Openmrs
       formFields.forEach(field => {
         let value = null;
         if (field.questionOptions.calculate && !asyncInitValues[field.id]) {
+          // evaluate initial value from calculate expression
           asyncInitValues[field.id] = evaluateAsyncExpression(
             field.questionOptions.calculate.calculateExpression,
             { value: field, type: 'field' },
             formFields,
-            tempInitVals,
+            initialValues,
             {
               mode: encounterContext.sessionMode,
               patient: encounterContext.patient,
@@ -63,19 +70,20 @@ export function useInitialValues(formFields: OHRIFormField[], encounter: Openmrs
           value = inferInitialValueFromDefaultFieldValue(field, encounterContext, getHandler(field.type));
         }
         if (!isEmpty(value)) {
-          tempInitVals[field.id] = value;
+          initialValues[field.id] = value;
         } else {
-          tempInitVals[field.id] =
+          initialValues[field.id] =
             emptyValues[field.questionOptions.rendering] != undefined
               ? emptyValues[field.questionOptions.rendering]
               : emptyValues.default;
         }
         if (field.unspecified) {
-          tempInitVals[`${field.id}-unspecified`] = false;
+          initialValues[`${field.id}-unspecified`] = false;
         }
       });
       setAsyncInitValues({ ...asyncInitValues });
     }
+    setInitialValues({ ...initialValues });
   }, [encounter]);
 
   return {
