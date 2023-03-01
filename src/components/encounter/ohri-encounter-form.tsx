@@ -92,8 +92,8 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
     [encounter, encounterDate, form?.encounter, location, patient, previousEncounter, sessionMode],
   );
 
-  const rawFormFields = useMemo(() => {
-    const ret = [];
+  const flattenedFields = useMemo(() => {
+    const flattenedFieldsTemp = [];
     form.pages.forEach(page =>
       page.sections.forEach(section => {
         section.questions.forEach(question => {
@@ -107,22 +107,22 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
           if (question.questionOptions.rendering == 'fixed-value' && !question['fixedValue']) {
             question['fixedValue'] = question.value;
           }
-          ret.push(question);
+          flattenedFieldsTemp.push(question);
           if (question.type == 'obsGroup') {
             question.questions.forEach(groupedField => {
               // set group id
               groupedField['groupId'] = question.id;
-              ret.push(groupedField);
+              flattenedFieldsTemp.push(groupedField);
             });
           }
         });
       }),
     );
-    return ret;
+    return flattenedFieldsTemp;
   }, []);
 
   const { initialValues: tempInitialValues, isFieldEncounterBindingComplete } = useInitialValues(
-    rawFormFields,
+    flattenedFields,
     encounter,
     encounterContext,
   );
@@ -151,9 +151,9 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
   useEffect(() => {
     if (tempInitialValues && Object.keys(tempInitialValues).length) {
       setFields(
-        rawFormFields.map(field => {
+        flattenedFields.map(field => {
           if (field.hide) {
-            evalHide({ value: field, type: 'field' }, rawFormFields, tempInitialValues);
+            evalHide({ value: field, type: 'field' }, flattenedFields, tempInitialValues);
           } else {
             field.isHidden = false;
           }
@@ -163,7 +163,7 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
             field.readonly = evaluateExpression(
               field.readonly,
               { value: field, type: 'field' },
-              rawFormFields,
+              flattenedFields,
               tempInitialValues,
               {
                 mode: sessionMode,
@@ -177,13 +177,13 @@ export const OHRIEncounterForm: React.FC<OHRIEncounterFormProps> = ({
 
       form.pages.forEach(page => {
         if (page.hide) {
-          evalHide({ value: page, type: 'page' }, rawFormFields, tempInitialValues);
+          evalHide({ value: page, type: 'page' }, flattenedFields, tempInitialValues);
         } else {
           page.isHidden = false;
         }
         page.sections.forEach(section => {
           if (section.hide) {
-            evalHide({ value: section, type: 'section' }, rawFormFields, tempInitialValues);
+            evalHide({ value: section, type: 'section' }, flattenedFields, tempInitialValues);
           } else {
             section.isHidden = false;
           }
