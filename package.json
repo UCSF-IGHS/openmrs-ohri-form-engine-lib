@@ -96,5 +96,8 @@
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.13.1"
   },
+  "resolutions": {
+    "@carbon/react": "1.13.0"
+  },
   "packageManager": "yarn@3.2.2"
 }
