@@ -7,12 +7,12 @@
   "license": "MIT",
   "homepage": "https://github.com/UCSF-IGHS/openmrs-ohri-form-engine-lib#readme",
   "scripts": {
+    "lint": "eslint src --ext tsx --fix",
     "verify": "turbo run lint && turbo run typescript && yarn run test",
     "prettier": "prettier --config prettier.config.js --write \"src/**/*.{ts,tsx}\"",
     "typescript": "tsc",
     "test": "jest --config ./jest.config.js --passWithNoTests",
-    "build": "webpack --mode production",
-    "extract-translations": "lerna run extract-translations"
+    "build": "webpack --mode production"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
