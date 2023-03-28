@@ -61,9 +61,9 @@ describe('Unspecified field', () => {
     await renderForm({});
 
     //setup
-    const unspecifiedCheckbox = screen.getByTestId(`${question.id}-unspecified`);
+    const unspecifiedCheckbox = screen.getByRole('checkbox', { name: /Unspecified/ });
     //assert
-    expect(unspecifiedCheckbox).toBeChecked();
+    expect(unspecifiedCheckbox).not.toBeChecked();
 
     fireEvent.click(unspecifiedCheckbox);
     expect(unspecifiedCheckbox).toBeChecked();
