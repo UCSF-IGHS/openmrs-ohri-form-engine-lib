@@ -48,7 +48,7 @@ export const OHRIUnspecified: React.FC<{
   }, [question.value]);
 
   const handleOnChange = useCallback(value => {
-    setFieldValue(`${question.id}-unspecified`, value);
+    setFieldValue(`${question.id}-unspecified`, value.target.checked);
   }, []);
 
   return (
