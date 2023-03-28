@@ -57,7 +57,7 @@ const renderForm = intialValues => {
 };
 
 describe('Unspecified field', () => {
-  it('should check whether checkbox is checked or not', async () => {
+  it('Should check whether unspecified checkbox is checked or not', async () => {
     await renderForm({});
 
     //setup
