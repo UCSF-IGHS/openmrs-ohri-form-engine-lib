@@ -67,5 +67,8 @@ describe('Unspecified field', () => {
 
     fireEvent.click(unspecifiedCheckbox);
     expect(unspecifiedCheckbox).toBeChecked();
+
+    fireEvent.click(unspecifiedCheckbox);
+    expect(unspecifiedCheckbox).not.toBeChecked();
   });
 });
