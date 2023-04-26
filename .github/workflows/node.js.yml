@@ -102,7 +102,7 @@ jobs:
         run: yarn
 
       - name: Bump form engine
-        run: yarn ci:bump-form-engine
+        run: yarn ci:bump-form-engine-lib
 
       - name: Commit changes
         run: |
@@ -174,7 +174,7 @@ jobs:
           run: yarn
 
         - name: Bump form engine
-          run: yarn ci:bump-form-engine
+          run: yarn ci:bump-form-engine-lib
 
         - name: Commit changes
           run: |
