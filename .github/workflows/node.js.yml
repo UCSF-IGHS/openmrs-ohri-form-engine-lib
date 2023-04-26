@@ -76,9 +76,12 @@ jobs:
       # Setup .npmrc file to publish to npm
         uses: actions/setup-node@v3
         with:
-          node-version: "16.x"
+          node-version: "18.x"
           registry-url: "https://registry.npmjs.org"
       - run: yarn
+      - run: |
+         yarn config set npmAlwaysAuth true
+         yarn config set npmAuthToken ${{ secrets.NPM_OHRI_ACCESS_TOKEN }}
       - run: yarn npm publish --access public --tag latest
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_OHRI_ACCESS_TOKEN }}
@@ -111,9 +114,9 @@ jobs:
       - name: Create PR
         uses: peter-evans/create-pull-request@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.ACTIONS_OHRI_PAT }}
           commit-message: "(chore) bump-form-engine"
           title: "(chore) Bump form engine"
           body: "This PR bumps the form engine, based on the latest change from the form-engine-repo"
-          branch: chop/bump-form-engine
+          branch: chore/bump-form-engine
           base: working
