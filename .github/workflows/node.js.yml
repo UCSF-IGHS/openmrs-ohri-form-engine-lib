@@ -138,7 +138,7 @@ jobs:
         run: yarn
 
       - name: Bump form engine
-        run: yarn ci:bump-form-engine
+        run: yarn ci:bump-form-engine-lib
 
       - name: Commit changes
         run: |
@@ -168,7 +168,7 @@ jobs:
           uses: actions/checkout@v3
           with:
             repository: openmrs/openmrs-esm-form-builder
-            ref: working
+            ref: main
         
         - name: Install dependencies
           run: yarn
