@@ -1,6 +1,9 @@
 name: Report bundle size
 
 on:
+  push:
+    branches:
+      - '*'
   pull_request:
     branches:
       - main
